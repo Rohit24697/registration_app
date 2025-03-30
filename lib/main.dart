@@ -6,8 +6,8 @@ import 'package:registration_app/otp_screen.dart';
 import 'welcome_screen.dart';
 
 Future<void> main() async {
-  // WidgetsFlutterBinding.ensureInitialized(); // Ensures plugin services are initialized
-  // await Firebase.initializeApp(); // Initialize Firebase
+  WidgetsFlutterBinding.ensureInitialized(); // Ensures plugin services are initialized
+  await Firebase.initializeApp(); // Initialize Firebase
   runApp(MyApp());
 }
 

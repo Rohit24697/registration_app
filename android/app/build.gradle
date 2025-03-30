@@ -7,7 +7,7 @@ plugins {
     id("com.google.gms.google-services")  // ✅ Ensure this is added
 
     // Apply the Google services Gradle plugin
-    id("com.google.gms.google-services") version "4.4.2"
+//    id("com.google.gms.google-services") version "4.4.2"
 }
 
 android {
@@ -57,4 +57,4 @@ flutter {
 }
 
 // Apply Google Services plugin at the very bottom
-apply(plugin = "com.google.gms.google-services")
+//apply(plugin = "com.google.gms.google-services")
