@@ -1,7 +1,6 @@
 import 'package:country_code_picker_plus/country_code_picker_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'otp_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -15,76 +14,76 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   final TextEditingController _mobileController = TextEditingController();
   String _countryCode = '+91';
 
-  Future<void> _sendOTP() async {
-    if (_formKey.currentState!.validate()) {
-      String fullMobileNumber = '$_countryCode${_mobileController.text.toString()}';
-
-      try {
-        await FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: fullMobileNumber,
-
-          verificationCompleted: (PhoneAuthCredential credential) async {
-            try {
-              UserCredential userCredential =
-              await FirebaseAuth.instance.signInWithCredential(credential);
-
-              if (userCredential.user != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Phone number verified successfully!")),
-                );
-
-                if (!mounted) return; // Ensure widget is still in tree
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => OTPScreen(
-                      mobile: fullMobileNumber,
-                      verificationId: credential.verificationId ?? '',
-                    ),
-                  ),
-                );
-              }
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Auto-verification failed. Please enter OTP manually.")),
-              );
-            }
-          },
-
-          verificationFailed: (FirebaseAuthException e) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Verification failed: ${e.message}')),
-            );
-          },
-
-          codeSent: (String verificationId, int? resendToken) {
-            if (!mounted) return; // Ensure widget is still in tree
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => OTPScreen(
-                  mobile: fullMobileNumber,
-                  verificationId: verificationId,
-                ),
-              ),
-            );
-          },
-
-          codeAutoRetrievalTimeout: (String verificationId) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("OTP auto-retrieval timed out. Please enter OTP manually.")),
-            );
-          },
-          timeout: const Duration(seconds: 60), // Set timeout duration
-        );
-      } catch (e) {
-        print("Error: $e");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to send OTP. Please try again.')),
-        );
-      }
-    }
-  }
+  // Future<void> _sendOTP() async {
+  //   if (_formKey.currentState!.validate()) {
+  //     String fullMobileNumber = '$_countryCode${_mobileController.text.trim()}';
+  //
+  //     try {
+  //       await FirebaseAuth.instance.verifyPhoneNumber(
+  //         phoneNumber: fullMobileNumber,
+  //
+  //         verificationCompleted: (PhoneAuthCredential credential) async {
+  //           try {
+  //             UserCredential userCredential =
+  //             await FirebaseAuth.instance.signInWithCredential(credential);
+  //
+  //             if (userCredential.user != null) {
+  //               ScaffoldMessenger.of(context).showSnackBar(
+  //                 SnackBar(content: Text("Phone number verified successfully!")),
+  //               );
+  //
+  //               if (!mounted) return; // Ensure widget is still in tree
+  //               Navigator.pushReplacement(
+  //                 context,
+  //                 MaterialPageRoute(
+  //                   builder: (context) => OTPScreen(
+  //                     mobile: fullMobileNumber,
+  //                     verificationId: credential.verificationId ?? '',
+  //                   ),
+  //                 ),
+  //               );
+  //             }
+  //           } catch (e) {
+  //             ScaffoldMessenger.of(context).showSnackBar(
+  //               SnackBar(content: Text("Auto-verification failed. Please enter OTP manually.")),
+  //             );
+  //           }
+  //         },
+  //
+  //         verificationFailed: (FirebaseAuthException e) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(content: Text('Verification failed: ${e.message}')),
+  //           );
+  //         },
+  //
+  //         codeSent: (String verificationId, int? resendToken) {
+  //           if (!mounted) return; // Ensure widget is still in tree
+  //           Navigator.push(
+  //             context,
+  //             MaterialPageRoute(
+  //               builder: (context) => OTPScreen(
+  //                 mobile: fullMobileNumber,
+  //                 verificationId: verificationId,
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //
+  //         codeAutoRetrievalTimeout: (String verificationId) {
+  //           ScaffoldMessenger.of(context).showSnackBar(
+  //             SnackBar(content: Text("OTP auto-retrieval timed out. Please enter OTP manually.")),
+  //           );
+  //         },
+  //         timeout: const Duration(seconds: 60), // Set timeout duration
+  //       );
+  //     } catch (e) {
+  //       print("Error: $e");
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Failed to send OTP. Please try again.')),
+  //       );
+  //     }
+  //   }
+  // }
 
 
   // final _formKey = GlobalKey<FormState>();
@@ -145,6 +144,82 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   //     }
   //   }
   // }
+
+
+  Future<void> _sendOTP() async {
+    if (_formKey.currentState!.validate()) {
+      String fullMobileNumber = '$_countryCode${_mobileController.text.trim()}';
+
+      try {
+        await FirebaseAuth.instance.verifyPhoneNumber(
+          phoneNumber: fullMobileNumber,
+          timeout: const Duration(seconds: 60), // Timeout duration
+
+          // Auto Verification (For some numbers, Google auto-verifies without OTP)
+          verificationCompleted: (PhoneAuthCredential credential) async {
+            try {
+              UserCredential userCredential =
+              await FirebaseAuth.instance.signInWithCredential(credential);
+
+              if (userCredential.user != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Phone number verified successfully!")),
+                );
+
+                if (!mounted) return;
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OTPScreen(
+                      mobile: fullMobileNumber,
+                      verificationId: "", // No need for OTP entry in auto-verification
+                    ),
+                  ),
+                );
+              }
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Auto-verification failed. Please enter OTP manually.")),
+              );
+            }
+          },
+
+          // Error Handling for OTP Sending
+          verificationFailed: (FirebaseAuthException e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Verification failed: ${e.message}')),
+            );
+          },
+
+          // OTP Sent Successfully
+          codeSent: (String verificationId, int? resendToken) {
+            if (!mounted) return;
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OTPScreen(
+                  mobile: fullMobileNumber,
+                  verificationId: verificationId, // Pass correct verificationId
+                ),
+              ),
+            );
+          },
+
+          // If Auto-Retrieval Fails
+          codeAutoRetrievalTimeout: (String verificationId) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("OTP auto-retrieval timed out. Please enter OTP manually.")),
+            );
+          },
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to send OTP: $e')),
+        );
+      }
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {

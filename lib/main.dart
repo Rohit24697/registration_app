@@ -1,10 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:registration_app/create_user_profile_screen.dart';
 import 'package:registration_app/otp_screen.dart';
 
 import 'welcome_screen.dart';
 
-void main() {
+Future<void> main() async {
+  // WidgetsFlutterBinding.ensureInitialized(); // Ensures plugin services are initialized
+  // await Firebase.initializeApp(); // Initialize Firebase
   runApp(MyApp());
 }
 
