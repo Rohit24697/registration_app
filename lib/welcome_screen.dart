@@ -149,6 +149,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Future<void> _sendOTP() async {
     if (_formKey.currentState!.validate()) {
       String fullMobileNumber = '$_countryCode${_mobileController.text.trim()}';
+      print(_countryCode);
+      print(fullMobileNumber);
 
       try {
         await FirebaseAuth.instance.verifyPhoneNumber(
